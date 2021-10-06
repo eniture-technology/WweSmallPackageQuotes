@@ -1,0 +1,21 @@
+<?php
+
+if ($block->enable == 'yes') {
+    $fedExModuleFlag = 'NO';
+    $block->setTemplate('Eniture_StandardBoxSizes::/system/config/boxsizestab.phtml');
+    echo $block->getHtml();
+} else {
+    ?>
+        <div class="boxsizes">
+            <p>
+            <?=
+             __(
+                'Click <a href="%1" target="_blank">here</a> to add the Standard Box Sizes module. (<a href="%2" target="_blank">Learn more</a>)',
+                "https://eniture.com/magento2-standard-box-sizes/",
+                "https://eniture.com/magento2-standard-box-sizes/#documentation"
+            )
+            ?>
+            </p>
+        </div>
+    <?php
+}

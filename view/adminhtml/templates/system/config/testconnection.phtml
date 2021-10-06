@@ -1,0 +1,28 @@
+<?php
+
+$planMsgDiv  = $block->wweSmPlanNotice();
+$connMsgDiv  = $block->wweSmConnMsg();
+?>
+<script>
+    require([ 'jquery', 'domReady!'], function($){
+            let carrierDiv = '#WweSmConnSetting_first-head';
+            wweSmNotesToggleHandling($, '<?php echo $connMsgDiv; ?>', '.wwesm-conn-setting-note', carrierDiv);
+            wweSmCurrentPlanNote($, '<?php echo $planMsgDiv; ?>', carrierDiv);
+    });
+</script>
+<div class="pp-buttons-container">
+    <button class="primary" id="<?= /* @noEscape */ $block->getId() ?>" connAjaxUrl='<?php echo $this->getAjaxCheckUrl() ?>'>
+        <span>
+            <span>
+                <span>
+                    <?= /* @noEscape */ $block->escapeHtml($block->getButtonLabel()); ?>
+                </span>
+            </span>
+        </span>
+    </button>
+</div>
+
+<!-- Display Test Conn Response Message -->
+<div id="wwesm-conn-response" class="wwesm-conn-response"></div>
+
+

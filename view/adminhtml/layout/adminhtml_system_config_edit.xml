@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <link src="Eniture_WweSmallPackageQuotes::js/wweSmCommon.js"/>
+        <link src="Eniture_WweSmallPackageQuotes::js/wweSmTestConnection.js"/>
+        <link src="Eniture_WweSmallPackageQuotes::js/wweSmWarehouse.js"/>
+        <link src="Eniture_WweSmallPackageQuotes::js/wweSmDropship.js"/>
+        <link src="Eniture_WweSmallPackageQuotes::js/wweSmRAD.js"/>
+        <link src="Eniture_WweSmallPackageQuotes::js/tagsinput/wweSm-bootstrap-tagsinput.js"/>
+    </head>
+</page>

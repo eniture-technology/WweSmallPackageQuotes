@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category   Shipping
+ * @package    Eniture_WweSmallPackageQuotes
+ * @author     Eniture Technologies
+ * @website    https://eniture.com
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="WweSmallPackageQuotes" translate="label" sortOrder="10">
+            <label>Eniture - Worldwide Express Small Package Quotes</label>
+        </tab>
+        <section id="carriers" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="ENWweSmpkg" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Eniture - Worldwide Express Small Package Quotes</label>
+                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled For Checkout</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+
+        <section id="WweSmConnSetting" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Connection Settings</label>
+            <tab>WweSmallPackageQuotes</tab>
+            <resource>Eniture_WweSmallPackageQuotes::config</resource>
+            <group id="first" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Connection Settings</label>
+                <field id="accountNumber" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Account Number</label>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="username" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Username</label>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="password" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Password</label>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="authenticationKey" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Authentication Key</label>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="licenseKey" translate="label" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Plugin License Key</label>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="testConnection" translate="label" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Eniture\WweSmallPackageQuotes\Block\System\Config\TestConnection</frontend_model>
+                </field>
+            </group>
+        </section>
+
+        <section id="WweSmWarehouse" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Warehouses</label>
+            <tab>WweSmallPackageQuotes</tab>
+            <resource>Eniture_WweSmallPackageQuotes::config</resource>
+            <group id="second" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Warehouses</label>
+                <field id="warehouse" translate="label" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Eniture\WweSmallPackageQuotes\Block\System\Config\Warehouse</frontend_model>
+                </field>
+                <field id="dropship" translate="label" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Eniture\WweSmallPackageQuotes\Block\System\Config\Dropship</frontend_model>
+                </field>
+            </group>
+        </section>
+        
+        <section id="WweSmQuoteSetting" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Quote Settings</label>
+            <tab>WweSmallPackageQuotes</tab>
+            <resource>Eniture_WweSmallPackageQuotes::config</resource>
+            <group id="third" translate="label" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Quote Settings</label>
+                <field id="serviceOptions" translate="label" type="multiselect" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Quote Service Options</label>
+                    <source_model>Eniture\WweSmallPackageQuotes\Model\Source\ServiceOptions</source_model>
+                </field>
+                <field id="transitDaysNumber" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enter the number of transit days to restrict ground service to. Leave blank to disable this feature.</label>
+                    <validate>validate-number validate-length maximum-length-2 validate-not-negative-number validate-wwesm-integer</validate>
+                </field>
+                <field id="transitDaysRestrictionBy" translate="label" type="radios" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Restrict By</label>
+                    <source_model>Eniture\WweSmallPackageQuotes\Model\Source\TransitDaysRestrictionBy</source_model>
+                </field>
+                <field id="residentialDlvry" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Always Quote Residential Delivery</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Residential Delivery.]]></comment>
+                </field>
+                <field id="residentialAddressDetect" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Auto detect residential addresses</label>
+                    <frontend_model>Eniture\WweSmallPackageQuotes\Block\System\Config\ResidentialAddressDetection</frontend_model>
+                </field>
+                <field id="boxSizesQuoteStng" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Use My Standard Box Sizes</label>
+                    <frontend_model>Eniture\WweSmallPackageQuotes\Block\System\Config\BoxSizes</frontend_model>
+                </field>
+                <field id="onlyGndService" translate="label" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Only quote ground service for hazardous materials shipments</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="gndHzrdousFee" translate="label" type="text" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Ground Hazardous Material Fee</label>
+                    <validate>validate-number validate-length maximum-length-7 validate-wwesm-decimal-limit-2</validate>
+                    <comment><![CDATA[Enter an amount, e.g 20. or Leave blank to disable.]]></comment>
+                </field>
+                <field id="airHzrdousFee" translate="label" type="text" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Air Hazardous Material Fee</label>
+                    <validate>validate-number validate-length maximum-length-7 validate-wwesm-decimal-limit-2</validate>
+                    <comment><![CDATA[Enter an amount, e.g 20. or Leave blank to disable.]]></comment>
+                </field>
+                <field id="hndlngFee" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Handling Fee / Markup</label>
+                    <validate>validate-number validate-length maximum-length-7 validate-wwesm-decimal-limit-2</validate>
+                </field>
+                <field id="symbolicHndlngFee" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Fee Type</label>
+                    <source_model>Eniture\WweSmallPackageQuotes\Model\Source\HandlingFee</source_model>
+                    <comment><![CDATA[Amount excluding tax. Enter an amount, e.g 3.75, or a percentage, e.g, 5%. Leave blank to disable.]]></comment>
+                </field>
+            </group>
+        </section>
+
+        <section id="WweSmBoxSizesTab" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Standard Box Sizes</label>
+            <tab>WweSmallPackageQuotes</tab>
+            <resource>Eniture_WweSmallPackageQuotes::config</resource>
+            <group id="fourth" translate="label" type="text" sortOrder="26" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Standard Box Sizes</label>
+                <field id="wweSmpkgBoxSizes" translate="label" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Eniture\WweSmallPackageQuotes\Block\System\Config\BoxSizesTab</frontend_model>
+                </field>
+            </group>
+        </section>
+
+        <section id="WweSmUserGuide" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>User Guide</label>
+            <tab>WweSmallPackageQuotes</tab>
+            <resource>Eniture_WweSmallPackageQuotes::config</resource>
+            <group id="fifth" translate="label" type="text" sortOrder="26" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>User Guide</label>
+                <field id="wweSmpkgUserGuide" translate="label" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Eniture\WweSmallPackageQuotes\Block\System\Config\UserGuide</frontend_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
