@@ -1,5 +1,6 @@
 <?php
 namespace Eniture\WweSmallPackageQuotes\Model\Source;
+
 /**
  * Source class for Warehouse and Dropship
  */

@@ -28,7 +28,7 @@ class TestConnection extends Action
     }
     
     public function execute()
-	{
+    {
         $credentials = [];
         foreach ($this->getRequest()->getPostValue() as $key => $data) {
             $credentials[$key] = filter_var($data, FILTER_SANITIZE_STRING);
@@ -44,7 +44,7 @@ class TestConnection extends Action
             'plugin_domain_name'                => $this->getStoreUrl(),
         ];
 
-        $response = $this->dataHelper->wweSmSendCurlRequest(WweSmConstants::TEST_CONN_URL,$postData);
+        $response = $this->dataHelper->wweSmSendCurlRequest(WweSmConstants::TEST_CONN_URL, $postData);
 
         $result = $this->wweSmTestConnResponse($response);
 
@@ -71,14 +71,13 @@ class TestConnection extends Action
             $return['Success'] =  $successMsg;
         }
         return json_encode($return);
-
     }
 
     /**
      * This function returns the Current Store Url
      * @return string
      */
-    public function getStoreUrl ()
+    public function getStoreUrl()
     {
         // It will be written to return Current Store Url in multi-store view
         return $this->getRequest()->getServer('SERVER_NAME');

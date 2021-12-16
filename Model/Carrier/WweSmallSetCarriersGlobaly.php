@@ -2,13 +2,15 @@
 /**
  * WWE Small Package
  * @package     WWE Small Package
- * @author      Eniture-Technology 
+ * @author      Eniture-Technology
  */
 namespace Eniture\WweSmallPackageQuotes\Model\Carrier;
+
 /**
  * Class for set carriers globally
  */
-class WweSmallSetCarriersGlobaly{
+class WweSmallSetCarriersGlobaly
+{
     public $dataHelper;
     /**
      * constructor of class

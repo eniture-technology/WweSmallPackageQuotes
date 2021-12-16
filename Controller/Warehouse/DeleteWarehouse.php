@@ -30,12 +30,12 @@ class DeleteWarehouse extends Action
     public function execute()
     {
         $msg = '';
-        foreach ($this->getRequest()->getPostValue() as $key => $post){
-            $deleteWhData[$key] = filter_var( $post, FILTER_SANITIZE_STRING );
+        foreach ($this->getRequest()->getPostValue() as $key => $post) {
+            $deleteWhData[$key] = filter_var($post, FILTER_SANITIZE_STRING);
         }
         
         $deleteID = $deleteWhData['delete_id'];
-        if($deleteWhData['action'] == 'delete_warehouse'){
+        if ($deleteWhData['action'] == 'delete_warehouse') {
             $qry = $this->dataHelper->deleteWarehouseSecData("warehouse_id='".$deleteID."'");
             $msg = 'Warehouse deleted successfully.';
         }
@@ -43,6 +43,6 @@ class DeleteWarehouse extends Action
         $canAddWh = $this->dataHelper->whPlanRestriction();
         $response = ['deleteID' => $deleteID, 'qryResp' => $qry, 'canAddWh' => $canAddWh, 'msg'=> $msg];
         $this->getResponse()->setHeader('Content-type', 'application/json');
-        $this->getResponse()->setBody(json_encode($response)); 
+        $this->getResponse()->setBody(json_encode($response));
     }
 }

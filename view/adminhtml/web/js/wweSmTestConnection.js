@@ -50,7 +50,6 @@
     }
     
     /**
-     * 
      * @param {object} data
      * @returns {void}
      */
@@ -66,3 +65,22 @@
         }
         wweSmResponseMessage(elemId, msgClass, msgText);
     }
+
+    /**
+     * Test connection ajax call
+     * @param {object} $
+     * @param {string} ajaxURL
+     * @returns {function}
+     */
+    function wweSmPlanRefresh(e){
+        let ajaxURL = e.getAttribute('planRefAjaxUrl');
+        let parameters = {};
+        wweSmAjaxRequest(parameters, ajaxURL, wweSmPlanRefreshResponse);
+    }
+
+    /**
+     * Handle response
+     * @param {object} data
+     * @returns {void}
+     */
+    function wweSmPlanRefreshResponse(data){}

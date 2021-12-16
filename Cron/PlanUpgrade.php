@@ -27,6 +27,10 @@ class PlanUpgrade
      * @var LoggerInterface
      */
     public $logger;
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
 
     /**
      * PlanUpgrade constructor.
@@ -39,11 +43,13 @@ class PlanUpgrade
         StoreManagerInterface $storeManager,
         Curl $curl,
         ConfigInterface $resourceConfig,
+        ScopeConfigInterface $scopeConfig,
         LoggerInterface $logger
     ) {
         $this->storeManager     = $storeManager;
         $this->curl             = $curl;
         $this->resourceConfig   = $resourceConfig;
+        $this->scopeConfig   = $scopeConfig;
         $this->logger           = $logger;
     }
 
@@ -54,11 +60,16 @@ class PlanUpgrade
     {
         $domain = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_WEB);
         $webhookUrl = $domain.'wwesmallpackagequotes';
+        $licenseKey = $this->scopeConfig->getValue(
+            'WweSmConnSetting/first/licenseKey',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
         $postData = http_build_query([
                 'platform'      => 'magento2',
                 'carrier'       => '10',
                 'store_url'     => $domain,
                 'webhook_url'   => $webhookUrl,
+                'license_key'   => ($licenseKey) ?? '',
             ]);
 
         $this->curl->post(WweSmConstants::PLAN_URL, $postData);

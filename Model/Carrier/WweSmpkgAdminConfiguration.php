@@ -1,5 +1,6 @@
 <?php
 namespace Eniture\WweSmallPackageQuotes\Model\Carrier;
+
 /**
  * class for admin configuration that runs first
  */
@@ -30,7 +31,7 @@ class WweSmpkgAdminConfiguration
     public function myUniqueLineItemAttribute()
     {
         $lineItemAttArr =  [];
-        if(is_null($this->registry->registry('UniqueLineItemAttributes'))){
+        if (is_null($this->registry->registry('UniqueLineItemAttributes'))) {
             $this->registry->register('UniqueLineItemAttributes', $lineItemAttArr);
         }
     }
@@ -40,9 +41,9 @@ class WweSmpkgAdminConfiguration
      */
     public function setCarriersAndHelpersCodesGlobaly()
     {
-        $this->setCodesGlobaly('enitureCarrierCodes','ENWweSmpkg');
+        $this->setCodesGlobaly('enitureCarrierCodes', 'ENWweSmpkg');
         $this->setCodesGlobaly('enitureCarrierTitle', 'Worldwide Small Package Quotes');
-        $this->setCodesGlobaly('enitureHelpersCodes','\Eniture\WweSmallPackageQuotes');
+        $this->setCodesGlobaly('enitureHelpersCodes', '\Eniture\WweSmallPackageQuotes');
         $this->setCodesGlobaly('enitureActiveModules', $this->checkModuleIsEnabled());
         $this->setCodesGlobaly('enatureModuleTypes', 'small');
     }
@@ -62,13 +63,13 @@ class WweSmpkgAdminConfiguration
      * @param $globArrayName
      * @param $arrValue
      */
-    public function setCodesGlobaly($globArrayName,$arrValue)
+    public function setCodesGlobaly($globArrayName, $arrValue)
     {
-        if(is_null($this->registry->registry($globArrayName))){
+        if (is_null($this->registry->registry($globArrayName))) {
             $codesArray = [];
             $codesArray['wweSmall'] = $arrValue;
             $this->registry->register($globArrayName, $codesArray);
-        }else{
+        } else {
             $codesArray = $this->registry->registry($globArrayName);
             $codesArray['wweSmall'] = $arrValue;
             $this->registry->unregister($globArrayName);

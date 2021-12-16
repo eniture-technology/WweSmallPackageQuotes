@@ -1,9 +1,10 @@
-<?php 
+<?php
 namespace Eniture\WweSmallPackageQuotes\Model\Source;
+
 class ServiceOptions
 {
-	public function toOptionArray()
-	{
+    public function toOptionArray()
+    {
         return [
             'serviceOptions' =>
                 ['value' => 'GND',  'label'  => 'UPS Ground'],

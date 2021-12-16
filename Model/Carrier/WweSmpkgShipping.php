@@ -134,10 +134,9 @@ class WweSmpkgShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier i
         $ItemsList          = $request->getAllItems();
         $receiverZipCode    = $request->getDestPostcode();
 
-        $package            = $this->GetWweSmpkgShipmentPackage($ItemsList,$receiverZipCode,$request);
+        $package            = $this->GetWweSmpkgShipmentPackage($ItemsList, $receiverZipCode, $request);
 
-
-        $this->wweReqData->_init($this->scopeConfig, $this->registry, $this->moduleManager, $this->dataHelper, $this->httpRequest);
+        $this->wweReqData->_init($this->scopeConfig, $this->registry, $this->moduleManager, $this->dataHelper, $this->httpRequest, $this->objectManager);
 
         $wweSmpkgArr        = $this->wweReqData->generateWweSmpkgArray();
 
@@ -147,12 +146,12 @@ class WweSmpkgShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier i
         $resp = $this->wweSetGlobalCarrier->manageCarriersGlobaly($wweSmpkgArr, $this->registry);
 
         $getQuotesFromSession = $this->quotesFromSession();
-        if(null !== $getQuotesFromSession){
+        if (null !== $getQuotesFromSession) {
             return $getQuotesFromSession;
         }
         
-        if(!$resp){
-            return FALSE;
+        if (!$resp) {
+            return false;
         }
         
         $requestArr = $this->wweReqData->generateRequestArray(
@@ -162,12 +161,13 @@ class WweSmpkgShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier i
             $this->cart
         );
 
-        if(empty($requestArr)){
-            return FALSE;
+        if (empty($requestArr)) {
+            return false;
         }
 
         $quotes = $this->dataHelper->wweSmSendCurlRequest(WweSmConstants::QUOTES_URL, $requestArr);
-        $this->wweMangQuotes->_init($quotes, $this->dataHelper, $this->scopeConfig, $this->registry, $this->moduleManager, $this->objectManager);
+
+        $this->wweMangQuotes->_init($quotes, $this->dataHelper, $this->scopeConfig, $this->registry, $this->session, $this->moduleManager, $this->objectManager);
         $quotesResult = $this->wweMangQuotes->getQuotesResultArr($request);
 
         $this->session->setEnShippingQuotes($quotesResult);
@@ -177,18 +177,18 @@ class WweSmpkgShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier i
     }
     
     /**
-     * 
+     *
      * @return type
      */
     public function quotesFromSession()
     {
         $currentAction = $this->urlInterface->getCurrentUrl();
         $currentAction = strtolower($currentAction);
-        if(strpos($currentAction, 'shipping-information') !== false || strpos($currentAction, 'payment-information') !== false){
+        if (strpos($currentAction, 'shipping-information') !== false || strpos($currentAction, 'payment-information') !== false) {
             $availableSessionQuotes = $this->session->getEnShippingQuotes(); // FROM SESSSION
             $availableQuotes = (!empty($availableSessionQuotes))?$this->setCarrierRates($availableSessionQuotes):null;
-        }else{
-            $availableQuotes = NULL;
+        } else {
+            $availableQuotes = null;
         }
         return $availableQuotes;
     }
@@ -246,17 +246,17 @@ class WweSmpkgShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier i
      * @param $request
      * @return array
      */
-    public function GetWweSmpkgShipmentPackage($items, $receiverZipCode,$request)
+    public function GetWweSmpkgShipmentPackage($items, $receiverZipCode, $request)
     {
         $this->wweShipPkg->_init($request, $this->scopeConfig, $this->dataHelper, $this->productloader, $this->httpRequest);
         
         $weightConfigExeedOpt = $this->scopeConfig->getValue('WweSmQuoteSetting/third/weightExeeds', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         
-        foreach($items as $key => $item) {
-            if($item->getRealProductType() == 'configurable'){
+        foreach ($items as $key => $item) {
+            if ($item->getRealProductType() == 'configurable') {
                 $this->qty= $item->getQty();
             }
-            if($item->getRealProductType() == 'simple'){
+            if ($item->getRealProductType() == 'simple') {
                 
                 $productQty = ( $this->qty> 0 ) ? $this->qty: $item->getQty();
                 $this->qty = 0;
@@ -267,9 +267,9 @@ class WweSmpkgShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier i
 
                 $lineItemClass  = $_product->getData('en_freight_class');
                 
-                if ( ($isEnableLtl) || ( $_product->getWeight() > 150 && $weightConfigExeedOpt) ) {
+                if (($isEnableLtl) || ( $_product->getWeight() > 150 && $weightConfigExeedOpt)) {
                     $freightClass = 'ltl';
-                }else{
+                } else {
                     $freightClass = '';
                 }
 
@@ -370,7 +370,8 @@ class WweSmpkgShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier i
         }
     }
 
-    public function setCarrierRates($quotes) {
+    public function setCarrierRates($quotes)
+    {
         $carrersArray   = $this->registry->registry('enitureCarrierCodes');
         $carrersTitle   = $this->registry->registry('enitureCarrierTitle');
         
@@ -378,21 +379,21 @@ class WweSmpkgShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier i
 
         foreach ($quotes as $carrierkey => $quote) {
             foreach ($quote as $key => $carreir) {
-                    if(isset($carreir['code']) && isset($carreir['title']) && isset($carreir['rate'])){
-                        $method = $this->rateMethodFactory->create();
-                        $carrierCode    = (isset($carrersTitle[$carrierkey]))? $carrersTitle[$carrierkey] : $this->_code;
-                        $carrierTitle   = (isset($carrersArray[$carrierkey]))? $carrersArray[$carrierkey] : $this->getConfigData('title');
-                        $method->setCarrierTitle($carrierCode);
-                        $method->setCarrier($carrierTitle);
-                        $method->setMethod($carreir['code']);
-                        $method->setMethodTitle($carreir['title']);
-                        $method->setPrice($carreir['rate']);
+                if (isset($carreir['code']) && isset($carreir['title']) && isset($carreir['rate'])) {
+                    $method = $this->rateMethodFactory->create();
+                    $carrierCode    = (isset($carrersTitle[$carrierkey]))? $carrersTitle[$carrierkey] : $this->_code;
+                    $carrierTitle   = (isset($carrersArray[$carrierkey]))? $carrersArray[$carrierkey] : $this->getConfigData('title');
+                    $method->setCarrierTitle($carrierCode);
+                    $method->setCarrier($carrierTitle);
+                    $method->setMethod($carreir['code']);
+                    $method->setMethodTitle($carreir['title']);
+                    $method->setPrice($carreir['rate']);
 
-                        $result->append($method);
-                    }
-
+                    $result->append($method);
                 }
+
             }
+        }
         
         return $result;
     }

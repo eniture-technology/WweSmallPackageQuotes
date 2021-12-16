@@ -315,12 +315,16 @@ class Data extends AbstractHelper
      * @param $isAssocArray
      * @return string
      */
-    public function wweSmSendCurlRequest($url, $postData, $isAssocArray=false)
+    public function wweSmSendCurlRequest($url, $postData, $isAssocArray = false)
     {
         $fieldString = http_build_query($postData);
-        $this->curl->post($url, $fieldString);
-        $output = $this->curl->getBody();
-        $result = json_decode($output, $isAssocArray);
+        try {
+            $this->curl->post($url, $fieldString);
+            $output = $this->curl->getBody();
+            $result = json_decode($output, $isAssocArray);
+        } catch (\Throwable $e) {
+            $result = [];
+        }
         return $result;
     }
 
@@ -335,29 +339,30 @@ class Data extends AbstractHelper
     }
     
     /**
-    * Method Quotes
-    * @param $quotes
-    * @param $getMinimum
-    * @return array
-    */
-    public function getQuotesResults($quotes, $isMultishipmentQuantity, $scopeConfig)
+     * Method Quotes
+     * @param $quotes
+     * @param $getMinimum
+     * @return array
+     */
+    public function getQuotesResults($quotes, $getMinimum, $isMultishipmentQuantity, $scopeConfig)
     {
         $binPackagingArr = $filteredQ = [];
-        $instPkpLclDlvry = '';
         $allConfigServices = $this->getAllConfigServicesArray($scopeConfig);
         $this->quoteSettingsData($scopeConfig);
 
-        if($isMultishipmentQuantity){
-            return $this->getOriginsMinimumQuotes($quotes,$allConfigServices, $scopeConfig);
+        $quotes = $this->getResiGroundRatesIfActive($quotes);
+
+        if ($isMultishipmentQuantity) {
+            return $this->getOriginsMinimumQuotes($quotes, $allConfigServices, $scopeConfig);
         }
 
         $multiShipment = (count($quotes)>1 ? true : false);
 
         foreach ($quotes as $key => $quote) {
             $instPkpLclDlvry = isset($quote->InstorPickupLocalDelivery) ? $quote->InstorPickupLocalDelivery : "";
-            if(!isset($quote->q)){
+            if (!isset($quote->q)) {
                 if (!empty($instPkpLclDlvry) && !$multiShipment) {
-                    $filteredQ[$key] = $this->instoreLocalDeliveryQuotes( [], $instPkpLclDlvry );
+                    $filteredQ[$key] = $this->instoreLocalDeliveryQuotes([], $instPkpLclDlvry);
                 }
                 continue;
             }
@@ -367,7 +372,7 @@ class Data extends AbstractHelper
             $binPackagingArr[] = $binPackaging;
             $binPackThisShip = (count($binPackaging) > 0 && isset($binPackaging[$key])) ? $binPackaging[$key] : [];
             $filQuotes = $this->parseQuotes($quote, $scopeConfig, $allConfigServices, $binPackThisShip, $instPkpLclDlvry, $key);
-            if(is_array($filQuotes) && count($filQuotes) > 0){
+            if (is_array($filQuotes) && count($filQuotes) > 0) {
                 $filteredQ[$key] = $filQuotes;
             }
         }
@@ -400,12 +405,14 @@ class Data extends AbstractHelper
 
         foreach ($availableServ->q as $servkey => $availableServ) {
 
-            if(in_array($availableServ->serviceType, $allConfigServices)){
+            if (in_array($availableServ->serviceType, $allConfigServices)) {
 
-                if($availableServ->serviceType == 'GND'){
+                if ($availableServ->serviceType == 'GND') {
                     // check for Ground restriction field
                     $restrictGndSer = $this->transitTimeRestriction($availableServ);
-                    if($restrictGndSer) continue;
+                    if ($restrictGndSer) {
+                        continue;
+                    }
                 }
 
                 $cost = isset($availableServ->totalNetCharge->Amount) ? $availableServ->totalNetCharge->Amount : 0;
@@ -416,7 +423,7 @@ class Data extends AbstractHelper
                 $addedHandlingCost = $this->calculateHandlingFee($cost, $scopeConfig);
                 $addedHzrdousCost = $this->calculateHazardousFee($serviceType, $addedHandlingCost, $originKey);
 
-                if($addedHzrdousCost > 0) {
+                if ($addedHzrdousCost > 0) {
                     $services[] = [
                         'code'          => $serviceType.'WWE',
                         'rate'          => $addedHzrdousCost,
@@ -426,7 +433,7 @@ class Data extends AbstractHelper
             }
         }
 
-        if(count($services) > 0){
+        if (count($services) > 0) {
             $priceSortedKey = [];
 
             foreach ($services as $key => $costCarrier) {
@@ -452,7 +459,7 @@ class Data extends AbstractHelper
     public function setBinPackagingData($quote, $key)
     {
         $binPackaging = [];
-        if(isset($quote->binPackagingData)) {
+        if (isset($quote->binPackagingData)) {
             $binPackaging[$key]['wweServices'] = $quote->binPackagingData ;
             $binPackaging[$key]['wweServices']->boxesFee = isset($quote->binPackagingData->response) ?
                 $this->calculateBoxesFee($quote->binPackagingData->response)
@@ -463,7 +470,6 @@ class Data extends AbstractHelper
 
     public function calculateBoxesFee($response)
     {
-
         $totalBoxesFee = 0;
         $boxesFee = $boxIDs = [];
         foreach ($response->bins_packed as $binDetails) {
@@ -477,7 +483,7 @@ class Data extends AbstractHelper
         if (!is_null($boxIDs) && count($boxIDs) > 0) {
             $boxFactory = $this->getBoxHelper('boxFactory');
             foreach ($boxIDs as $boxID) {
-                if(!array_key_exists($boxID, $boxesFee)){
+                if (!array_key_exists($boxID, $boxesFee)) {
                     $boxCollection = $boxFactory->getCollection()->addFilter('box_id', ['eq' => $boxID])->addFieldToSelect('boxfee');
                     foreach ($boxCollection as $box) {
                         $boxFee = $box->getData();
@@ -493,7 +499,8 @@ class Data extends AbstractHelper
     }
 
 
-    public function getBoxHelper($objectName) {
+    public function getBoxHelper($objectName)
+    {
         if ($objectName == 'helper') {
             return $this->objectManager->get("Eniture\StandardBoxSizes\Helper\Data");
         }
@@ -565,7 +572,7 @@ class Data extends AbstractHelper
                 $this->residentialDlvry = $isRadSuspend == "no" ? null : $this->residentialDlvry;
             }
 
-            if($this->residentialDlvry == null
+            if ($this->residentialDlvry == null
             || $this->residentialDlvry == '0') {
                 if ($service == 'r') {
                     $append = ' with residential delivery';
@@ -586,54 +593,70 @@ class Data extends AbstractHelper
     public function findArrayMininum($servicesArr)
     {
         $counter = 1;
-        $minIndex = array();
+        $minIndex = [];
         foreach ($servicesArr as $key => $value) {
-            if($counter == 1){
-               $minimum =  $value['rate'];
-               $minIndex = $value;
-               $counter = 0;
-            }else{
-               if($value['rate'] < $minimum){
-                   $minimum =  $value['rate'];
-                   $minIndex = $value;
-               }
+            if ($counter == 1) {
+                $minimum =  $value['rate'];
+                $minIndex = $value;
+                $counter = 0;
+            } else {
+                if ($value['rate'] < $minimum) {
+                    $minimum =  $value['rate'];
+                    $minIndex = $value;
+                }
             }
         }
         return $minIndex;
     }
 
     /**
-     *
      * @param array $quotes
      * @param array $allConfigServices
      * @param object $scopeConfig
      * @return array
      */
-    public function getOriginsMinimumQuotes($quotes,$allConfigServices, $scopeConfig)
+    public function getOriginsMinimumQuotes($quotes, $allConfigServices, $scopeConfig)
     {
-        $minIndexArr = [];
-        $binPackagingArr = [];
+        $minIndexArr = $binPackagingArr = [];
+        $resiArr = ['residential' => false, 'label' => ''];
         foreach ($quotes as $key => $quote) {
-            $minInQ = $counter = 0;
+            $minInQ = [];
+            $counter = 0;
 
             $binPackaging = $this->setBinPackagingData($quote, $key);
             $binPackagingArr[] = $binPackaging;
 
-            if(isset($quote->q)){
-                foreach ($quote->q as $servkey => $availableServ) {
-                    if( in_array( $availableServ->serviceType, $allConfigServices ) ){
-                        $curruntAmount = $availableServ->totalNetCharge->Amount;
-                        if($counter == 0){
-                            $minInQ = $curruntAmount;
-                        }else{
-                            $minInQ = ($curruntAmount < $minInQ ? $curruntAmount : $minInQ);
-                        }   
+            $isRad = $quote->autoResidentialsStatus ?? '';
+            $resi = $this->getAutoResidentialTitle($isRad);
 
+            if ($this->residentialDlvry == "1" || $resi != '') {
+                $resiArr = ['residential' => true, 'label' => $resi];
+            }
+
+            if (isset($quote->q)) {
+                foreach ($quote->q as $servkey => $availableServ) {
+                    if (isset($availableServ->serviceType)
+                        && in_array($availableServ->serviceType, $allConfigServices)) {
+                        $totalAmount = isset($availableServ->totalNetCharge->Amount) ? $availableServ->totalNetCharge->Amount : 0;
+                        $boxFee = isset($binPackaging['unishippersServices']->boxesFee) ? $binPackaging['unishippersServices']->boxesFee : 0;
+                        $totalAmount += $boxFee;
+                        $addedHandling = $this->calculateHandlingFee($totalAmount, $scopeConfig);
+                        $addedHazardous = $this->calculateHazardousFee($availableServ->serviceType, $addedHandling, $key);
+                        if ((isset($availableServ->serviceDesc) && !empty($availableServ->serviceDesc)) && $addedHazardous > 0) {
+                            $currentArray = ['code' => $availableServ->serviceType . 'UNS',
+                                'rate' => $addedHazardous,
+                                'title' => $availableServ->serviceDesc . ' ' . $resi,
+                                'resi' => $resiArr];
+                            if ($counter == 0) {
+                                $minInQ = $currentArray;
+                            } else {
+                                $minInQ = ($currentArray['rate'] < $minInQ['rate'] ? $currentArray : $minInQ);
+                            }
+                        }
                         $counter ++;
                     }
                 }
-                if($minInQ > 0){
-                    $minInQ = $this->calculateHandlingFee($minInQ, $scopeConfig);
+                if ($minInQ['rate'] > 0) {
                     $minIndexArr[$key] = $minInQ;
                 }
             }
@@ -641,7 +664,6 @@ class Data extends AbstractHelper
 
         $this->coreSession->start();
         $this->coreSession->setSemiBinPackaging($binPackagingArr);
-
         return $minIndexArr;
     }
 
@@ -649,7 +671,8 @@ class Data extends AbstractHelper
      * This Function returns all active services array from configurations
      * @return array
      */
-    public function getAllConfigServicesArray($scopeConfig){
+    public function getAllConfigServicesArray($scopeConfig)
+    {
         $servicesOptions   = $scopeConfig->getValue('WweSmQuoteSetting/third/serviceOptions', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         $quoteServices     = explode(',', $servicesOptions);
 
@@ -657,15 +680,16 @@ class Data extends AbstractHelper
     }
     
     /**
-    * Final quotes array
-    * @param $grandTotal
-    * @param $code
-    * @param $title
-    * @return array
-    */    
-    public function getFinalQuoteArray($grandTotal, $code, $title) {
+     * Final quotes array
+     * @param $grandTotal
+     * @param $code
+     * @param $title
+     * @return array
+     */
+    public function getFinalQuoteArray($grandTotal, $code, $title)
+    {
         $allowed = [];
-        if( $grandTotal > 0 ) {
+        if ($grandTotal > 0) {
             $allowed = [
                 'code'  => $code,// or carrier name
                 'title' => $title,
@@ -779,20 +803,22 @@ class Data extends AbstractHelper
     }
 
     /**
-     * 
+     *
      * @param type $fieldId
      * @param type $scopeConfig
      * @return type
      */
-    function adminConfigData($fieldId, $scopeConfig) {
+    function adminConfigData($fieldId, $scopeConfig)
+    {
         return $scopeConfig->getValue("WweSmQuoteSetting/third/$fieldId", \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
     
     /**
-     * 
+     *
      * @return type
      */
-    function getActiveCarriersForENCount() {
+    function getActiveCarriersForENCount()
+    {
         return $this->shippingConfig->getActiveCarriers();
     }
 
@@ -836,15 +862,13 @@ class Data extends AbstractHelper
     /**
      * @return string
      */
-    public function wweSmallSetPlanNotice()
+    public function wweSmallSetPlanNotice($planRefreshUrl = '')
     {
-
-        $planMsg = '';
         $planPackage = $this->wweSmallPlanInfo('ENWweSmpkg');
         if (is_null($planPackage['storeType'])) {
             $planPackage = [];
         }
-        $planMsg = $this->displayPlanMessages($planPackage);
+        $planMsg = $this->displayPlanMessages($planPackage, $planRefreshUrl);
         return $planMsg;
     }
 
@@ -852,14 +876,22 @@ class Data extends AbstractHelper
      * @param type $planPackage
      * @return type
      */
-    public function displayPlanMessages($planPackage)
+    public function displayPlanMessages($planPackage, $planRefreshUrl = '')
     {
-        $planMsg = __('Eniture - Worldwide Express Small Package Quotes plan subscription is inactive. Please activate plan subscription from <a target="_blank" href="https://eniture.com/magento2-worldwide-express-small-package/">here</a>.');
+        $planRefreshLink = '';
+        if (!empty($planRefreshUrl)) {
+            $planRefreshLink = ' <a href="javascript:void(0)" id="plan-refresh-link" planRefAjaxUrl = '.$planRefreshUrl.' onclick="wweSmPlanRefresh(this)" >Click here</a> to refresh the plan (please sign-in again after this action).';
+            $planMsg = __('The subscription to the Worldwide Express Small Package Quotes module is inactive. If you believe the subscription should be active and you recently changed plans (e.g. upgraded your plan), your firewall may be blocking confirmation from our licensing system. To resolve the situation, <a href="javascript:void(0)" id="plan-refresh-link" planRefAjaxUrl = '.$planRefreshUrl.' onclick="wweSmPlanRefresh(this)" >click this link</a> and then sign in again. If this does not resolve the issue, log in to eniture.com and verify the license status.');
+        }else{
+            $planMsg = __('Eniture - Worldwide Express Small Package Quotes plan subscription is inactive. Please log into eniture.com and update your license.');
+        }
+
         if (isset($planPackage) && !empty($planPackage)) {
             if (!is_null($planPackage['planNumber']) && $planPackage['planNumber'] != '-1') {
-                $planMsg = __('Eniture - Worldwide Express Small Package Quotes is currently on the '.$planPackage['planName'].'. Your plan will expire within '.$planPackage['expireDays'].' days and plan renews on '.$planPackage['expiryDate'].'.');
+                $planMsg = __('Eniture - Worldwide Express Small Package Quotes is currently on the '.$planPackage['planName'].'. Your plan will expire within '.$planPackage['expireDays'].' days and plan renews on '.$planPackage['expiryDate'].'.'.$planRefreshLink);
             }
         }
+
         return $planMsg;
     }
 
@@ -922,7 +954,8 @@ class Data extends AbstractHelper
     /**
      * @return int
      */
-    public function checkAdvancePlan() {
+    public function checkAdvancePlan()
+    {
         $advncPlan = 1;
         $planArr = $this->wweSmallPlanInfo('ENWweSmpkg');
         $planNumber = isset($planArr['planNumber']) ? $planArr['planNumber'] : '';
@@ -1025,5 +1058,20 @@ class Data extends AbstractHelper
             $return['suppress_other'] = $locDel['suppress_other']=='1' ? true : false;
         }
         return $return;
+    }
+
+    /**
+     * @return void
+     */
+    protected function getResiGroundRatesIfActive($quotes)
+    {
+
+        $moduleManager = $this->context->getModuleManager();
+        if ($moduleManager->isEnabled('Eniture_WweSpqSecondAccount')) {
+            $helperObj = $this->objectManager->get("Eniture\WweSpqSecondAccount\Helper\Data");
+            $quotes = $helperObj->addResiGroundRatesIntoNormalRatesArr($quotes);
+        }
+
+        return $quotes;
     }
 }

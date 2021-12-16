@@ -10,7 +10,6 @@
 namespace Eniture\WweSmallPackageQuotes\Setup;
 
 use Eniture\WweSmallPackageQuotes\App\State;
-use Eniture\WweSmallPackageQuotes\Cron\PlanUpgrade;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
@@ -62,10 +61,6 @@ class InstallData implements InstallDataInterface
      */
     private $resourceConfig;
     /**
-     * @var PlanUpgrade
-     */
-    private $planUpgrade;
-    /**
      * @var State
      */
     private $state;
@@ -93,7 +88,6 @@ class InstallData implements InstallDataInterface
      * @param ProductFactory $productLoader
      * @param Config $eavConfig
      * @param ConfigInterface $resourceConfig
-     * @param PlanUpgrade $planUpgrade
      */
     public function __construct(
         EavSetupFactory $eavSetupFactory,
@@ -101,8 +95,7 @@ class InstallData implements InstallDataInterface
         CollectionFactory $collectionFactory,
         ProductFactory $productLoader,
         Config $eavConfig,
-        ConfigInterface $resourceConfig,
-        PlanUpgrade $planUpgrade
+        ConfigInterface $resourceConfig
     ) {
         $this->eavSetupFactory      = $eavSetupFactory;
         $this->collectionFactory    = $collectionFactory;
@@ -110,7 +103,6 @@ class InstallData implements InstallDataInterface
         $this->eavConfig            = $eavConfig;
         $this->state                = $state;
         $this->resourceConfig       = $resourceConfig;
-        $this->planUpgrade          = $planUpgrade;
     }
 
 
@@ -122,10 +114,6 @@ class InstallData implements InstallDataInterface
     {
         $this->initVars($setup);
         $this->state->validateAreaCode();
-
-//      Check plan info of current module
-        $this->planUpgrade->execute();
-
         $this->attrNames();
         $this->renameOldAttributes();
         $this->addWweSmallAttributes();
@@ -174,7 +162,8 @@ class InstallData implements InstallDataInterface
                     Product::ENTITY,
                     "wwe_$attr",
                     "attribute_code",
-                    "en_$attr");
+                    "en_$attr"
+                );
             }
         }
     }
@@ -209,10 +198,10 @@ class InstallData implements InstallDataInterface
     {
         $count = 71;
         foreach ($this->attrNames as $attr) {
-            if($attr == 'length' || $attr == 'width' || $attr == 'height'){
+            if ($attr == 'length' || $attr == 'width' || $attr == 'height') {
                 $isTsAttExists = $this->eavConfig
                     ->getAttribute('catalog_product', 'ts_dimensions_' . $attr . '')->getAttributeId();
-                if($isTsAttExists != null){
+                if ($isTsAttExists != null) {
                     $this->haveTsAttributes = true;
                     continue;
                 }
@@ -261,7 +250,8 @@ class InstallData implements InstallDataInterface
                 Product::ENTITY,
                 "en_dropship_location",
                 "source_model",
-                "Eniture\WweSmallPackageQuotes\Model\Source\DropshipOptions");
+                "Eniture\WweSmallPackageQuotes\Model\Source\DropshipOptions"
+            );
         }
 
         $isHazmatExist = $this->eavConfig->getAttribute('catalog_product', 'en_hazmat')->getAttributeId();
@@ -361,10 +351,18 @@ class InstallData implements InstallDataInterface
                 ->addColumn('nickname', Table::TYPE_TEXT, 30, [
                     'nullable'  => false,
                 ], 'nickname')
-                ->addColumn( 'in_store', Table::TYPE_TEXT, 512, [],
+                ->addColumn(
+                    'in_store',
+                    Table::TYPE_TEXT,
+                    512,
+                    [],
                     'in store pick up'
                 )
-                ->addColumn( 'local_delivery', Table::TYPE_TEXT, 512, [],
+                ->addColumn(
+                    'local_delivery',
+                    Table::TYPE_TEXT,
+                    512,
+                    [],
                     'local delivery'
                 );
             $this->connection->createTable($table);

@@ -83,11 +83,20 @@ class TestConnection extends Field
      */
     public function wweSmPlanNotice()
     {
-        return $this->dataHelper->wweSmallSetPlanNotice();
+        $planRefreshUrl = $this->getPlanRefreshUrl();
+        return $this->dataHelper->wweSmallSetPlanNotice($planRefreshUrl);
     }
 
     public function wweSmConnMsg()
     {
         return '<div class="message message-notice notice wwesm-conn-setting-note">You must have a Worldwide Express account to use this application. If you do not have one contact Worldwide Express at 800-734-5351 or <a target="_blank" href="https://eniture.com/request-worldwide-express-account-number/">register online</a>.</div>';
+    }
+
+    /**
+     * @return url
+     */
+    public function getPlanRefreshUrl()
+    {
+        return $this->getbaseUrl().'wwesmallpackagequotes/Test/PlanRefresh/';
     }
 }

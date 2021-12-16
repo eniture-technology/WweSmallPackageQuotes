@@ -3,7 +3,7 @@
 $advancedPlan = false;
 $class = 'disabledDiv';
 $disableInput = 'disabled="disabled"';
-if ($this->currentPlan == 3) {
+if ($block->currentPlan == 3) {
     $advancedPlan = true;
     $class = '';
     $disableInput = '';
@@ -34,7 +34,7 @@ if ($this->currentPlan == 3) {
         <thead>
         <tr>
             <th>
-                <?= $block->escapeHtmlAttr( __('Nickname')) ?>
+                <?= $block->escapeHtmlAttr(__('Nickname')) ?>
             </th>
             <th>
                 <?= __('City') ?>
@@ -157,7 +157,7 @@ if ($this->currentPlan == 3) {
             <?= __('In-store Pick Up') ?>
         </h2>
 
-        <?php if (!$advancedPlan) : ?>
+        <?php if (!$advancedPlan): ?>
             <a class="is-heading-right" href="https://eniture.com/magento2-ups-ltl-freight">
                 <?= __('Advanced Plan Required') ?>
             </a>
@@ -212,7 +212,7 @@ if ($this->currentPlan == 3) {
             <h2 class="wh-heading ld-heading-left" id="ds-ld-heading-left">
                 <?= __('Local Delivery') ?>
             </h2>
-            <?php if (!$advancedPlan) : ?>
+            <?php if (!$advancedPlan): ?>
                 <a class="ld-heading-right" href="https://eniture.com/magento2-ups-ltl-freight/">
                     <?= __('Advanced Plan Required') ?>
                 </a>

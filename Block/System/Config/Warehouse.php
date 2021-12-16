@@ -90,7 +90,7 @@ class Warehouse extends Field
     /**
      * Fetching all the warehouses from Database
      */
-    public function fetchWarehouses ()
+    public function fetchWarehouses()
     {
         $this->warehouses = $this->dataHelper->fetchWarehouseSecData('warehouse');
     }
@@ -109,7 +109,8 @@ class Warehouse extends Field
      */
     public function wweSmallSetPlanNotice()
     {
-        return $this->dataHelper->wweSmallSetPlanNotice();
+        $planRefreshUrl = $this->getPlanRefreshUrl();
+        return $this->dataHelper->wweSmallSetPlanNotice($planRefreshUrl);
     }
 
     /**
@@ -118,5 +119,13 @@ class Warehouse extends Field
     public function addWhRestriction()
     {
         $this->canAddWarehouse = ($this->currentPlan < 2 && count($this->warehouses) > 0) ? 0 : 1;
+    }
+
+    /**
+     * @return url
+     */
+    public function getPlanRefreshUrl()
+    {
+        return $this->getbaseUrl().'wwesmallpackagequotes/Test/PlanRefresh/';
     }
 }

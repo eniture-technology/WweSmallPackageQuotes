@@ -35,24 +35,26 @@ class WweSmpkgShipmentPackage
     public function wweSmpkgOriginAddress($_product, $receiverZipCode)
     {
         $whQuery        = $this->dataHelper->fetchWarehouseSecData('warehouse');
-        $enableDropship = $_product->getData('en_dropship');   
+        $enableDropship = $_product->getData('en_dropship');
         
-        if( $enableDropship ){
+        if ($enableDropship) {
             $dropshipID = $_product->getData('en_dropship_location');
             $originList = $this->dataHelper->fetchWarehouseWithID('dropship', $dropshipID);
             
-            if(!$originList){
+            if (!$originList) {
                 $product = $this->productloader->create()->load($_product->getEntityId());
                 $product->setData('en_dropship', 0)->getResource()->saveAttribute($product, 'en_dropship');
-                $origin    = $whQuery;         
-            }else{
+                $origin    = $whQuery;
+            } else {
                 $origin = $originList;
             }
-        }else{
+        } else {
             $origin    = $whQuery;
         }
         
-        if(!empty($origin)){ return $this->multiWarehouse($origin, $receiverZipCode); }
+        if (!empty($origin)) {
+            return $this->multiWarehouse($origin, $receiverZipCode);
+        }
     }
     
     /**
@@ -147,7 +149,7 @@ class WweSmpkgShipmentPackage
     }
 
     /**
-     * 
+     *
      * @param type $origins
      * @return type
      */
@@ -177,7 +179,7 @@ class WweSmpkgShipmentPackage
             if ($instore->enable_store_pickup == 1) {
                 $array['inStorePickup'] = [
                     'addressWithInMiles' =>$instore->miles_store_pickup ,
-                    'postalCodeMatch'    =>$this->checkPostalCodeMatch($receiverZipCode,$instore->match_postal_store_pickup),
+                    'postalCodeMatch'    =>$this->checkPostalCodeMatch($receiverZipCode, $instore->match_postal_store_pickup),
                 ];
             }
         }
@@ -187,7 +189,7 @@ class WweSmpkgShipmentPackage
             if ($locDel->enable_local_delivery == 1) {
                 $array['localDelivery'] = [
                     'addressWithInMiles' => $locDel->miles_local_delivery,
-                    'postalCodeMatch'    =>$this->checkPostalCodeMatch($receiverZipCode,$locDel->match_postal_local_delivery),
+                    'postalCodeMatch'    =>$this->checkPostalCodeMatch($receiverZipCode, $locDel->match_postal_local_delivery),
                     'suppressOtherRates' =>$locDel->suppress_other,
                 ];
             }

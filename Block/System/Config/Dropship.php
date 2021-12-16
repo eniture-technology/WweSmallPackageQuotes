@@ -87,7 +87,7 @@ class Dropship extends Field
     /**
      * Fetching all the dropships from Database
      */
-    public function fetchDropships ()
+    public function fetchDropships()
     {
         $this->dropships = $this->dataHelper->fetchWarehouseSecData('dropship');
     }

@@ -25,7 +25,6 @@ class ProductPlanRestriction extends \Magento\Config\Block\System\Config\Form\Fi
      */
     private $context;
 
-
     /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Framework\Module\Manager $moduleManager
@@ -89,8 +88,8 @@ class ProductPlanRestriction extends \Magento\Config\Block\System\Config\Form\Fi
     public function setPlanMsg($msgInfo, $index)
     {
         $msg = "";
-        foreach ($msgInfo as  $res) {
-            if (isset($res[$index])){
+        foreach ($msgInfo as $res) {
+            if (isset($res[$index])) {
                 if ($res[$index] == 'Enabled') {
                     $planMsg = ' '. $res['label'] . ' : <b>' . $res[$index] . '</b>.<br>';
                 }
@@ -121,17 +120,17 @@ class ProductPlanRestriction extends \Magento\Config\Block\System\Config\Form\Fi
                     'label' => $carrierLabel,
                     'plan' => $carrierPlan
                 ];
-                if(strpos($carrierCode,'LTL')){
+                if (strpos($carrierCode, 'LTL') !== false) {
                     $numLTL++;
                 }
-                if(strpos($carrierCode,'Smpkg')){
+                if (strpos($carrierCode, 'Smpkg') !== false) {
                     $numSmpkg++;
                 }
                 if ($carrierPlan > 1) {
                     $hazmat = $insurance = 'Enabled';
                     $hazEn++;
                 }
-                if($numLTL) {
+                if ($numLTL) {
                     $restriction['data'][$carrierCode]['hazmat'] = $hazmat;
                 } elseif ($numSmpkg) {
                     if ($carrierPlan > 1) {
@@ -149,7 +148,8 @@ class ProductPlanRestriction extends \Magento\Config\Block\System\Config\Form\Fi
         return $restriction;
     }
 
-    public function getConfiguration($carrierCode, $reqFor) {
+    public function getConfiguration($carrierCode, $reqFor)
+    {
         return $this->context->getScopeConfig()->getValue(
             'eniture/'.$carrierCode.'/'.$reqFor.''
         );

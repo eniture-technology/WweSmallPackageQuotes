@@ -159,7 +159,8 @@ class ResidentialAddressDetection extends Field
      */
     public function wweSmallPlanNotice()
     {
-        return $this->dataHelper->wweSmallSetPlanNotice();
+        $planRefreshUrl = $this->getPlanRefreshUrl();
+        return $this->dataHelper->wweSmallSetPlanNotice($planRefreshUrl);
     }
     
     /**
@@ -168,5 +169,13 @@ class ResidentialAddressDetection extends Field
     public function planRstrctnQuoteSettng()
     {
         return json_encode($this->dataHelper->quoteSettingFieldsToRestrict());
+    }
+
+    /**
+     * @return url
+     */
+    public function getPlanRefreshUrl()
+    {
+        return $this->getbaseUrl().'unishipperssmallpackagequotes/Test/PlanRefresh/';
     }
 }

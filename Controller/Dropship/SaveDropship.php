@@ -72,7 +72,7 @@ class SaveDropship extends Action
                     $insertQry = $this->dataHelper->insertWarehouseData($validateData, $dropshipId);
                     $msg = 'Drop ship added successfully.';
             }
-        $lastId = ($updateQry) ? $dropshipId : $insertQry['lastId'];
+            $lastId = ($updateQry) ? $dropshipId : $insertQry['lastId'];
         } else {
             $lastId = '';
             $msg = 'City name is invalid';
@@ -136,7 +136,7 @@ class SaveDropship extends Action
                                         ->addFilter('location', ['eq' => 'dropship'])
                                         ->addFilter('nickname', ['eq' => $nickname]);
             return count($this->dataHelper->purifyCollectionData($dsCollection));
-        }
+    }
 
     /**
      * @param string $nickname

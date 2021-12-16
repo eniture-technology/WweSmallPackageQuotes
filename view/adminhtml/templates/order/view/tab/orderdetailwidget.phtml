@@ -5,19 +5,19 @@
     $orderDetailData = $order->getData('order_detail_data');
     $orderDetailData = isset($orderDetailData)?json_decode($orderDetailData, true):null;
     if (!is_null($orderDetailData)) {
-    $shimentNumber = 1;
-    foreach ($orderDetailData['shipmentData'] as $key => $order) {
-        $residential = $orderDetailData['residentialDelivery'];
+        $shimentNumber = 1;
+        foreach ($orderDetailData['shipmentData'] as $key => $order) {
+            $residential = $orderDetailData['residentialDelivery'];
 
-        if (isset($order) && !empty($order)) {
-            $title = (isset($order['quotes']['title']))?$order['quotes']['title'].' :':'';
-            $rate = (isset($order['quotes']['rate']))?number_format($order['quotes']['rate'], 2, '.', ''):'0.00';
+            if (isset($order) && !empty($order)) {
+                $title = (isset($order['quotes']['title']))?$order['quotes']['title'].' :':'';
+                $rate = (isset($order['quotes']['rate']))?number_format($order['quotes']['rate'], 2, '.', ''):'0.00';
 
-            if ($shimentNumber > 1) {
-                ?>
+                if ($shimentNumber > 1) {
+                    ?>
                     <hr class="order-info-hr">
-                <?php
-            }
+                    <?php
+                }
                 ?>
 
             <div class="order-detail-block">
@@ -39,9 +39,9 @@
                 $findHazardous = array_column($lineItems, 'isHazmatLineItem');
 
                 $hazordusFee = '';
-                if(is_array($findHazardous) && count($findHazardous) > 0){
-                    foreach ($findHazardous as $hasStatus){
-                        if($hasStatus == 'Y'){
+                if (is_array($findHazardous) && count($findHazardous) > 0) {
+                    foreach ($findHazardous as $hasStatus) {
+                        if ($hasStatus == 'Y') {
                             $hazordusFee = 'Hazardous material';
                             break;
                         }
@@ -49,12 +49,12 @@
                 }
 
                 if ($residential || $hazordusFee) {
-                ?>
+                    ?>
                             <h4 class='order-detail-hdng'>Additional Information</h4>
                             <div class="order-additionalInfo-block">
                         <?php
                         if ($residential) {
-                        ?>
+                            ?>
                                     <span class="list-item">
                                 <?= $residential ?>
                                     </span>
@@ -71,35 +71,35 @@
                             </div>
                     <?php
                 }
-                    ?>
+                ?>
                 <h4 class='order-detail-hdng'>
                     Shipment <?= /* @noEscape */ $shimentNumber ?> > items
                 </h4>
                     <?php
                     foreach ($order['item'] as $key => $lineItem) {
-                    ?>
+                        ?>
                         <div class="order-item-block">
                             <span class="list-item">
                                 <?= /* @noEscape */ $lineItem['piecesOfLineItem'] .' x '. /* @noEscape */ $lineItem['lineItemName'] ?>
                             </span>
                         </div>
-                    <?php
+                        <?php
                     }
                     ?>
 
             <!-- Clear the float effect -->
             <div class="en-clear"></div>
             </div>
-            <?php
+                <?php
+            }
+            $shimentNumber++;
         }
-        $shimentNumber++;
-    }
     } else {
         ?>
         <h4>
             <?= /* @noEscape */ "No additional details are found!"; ?>
         </h4>
-    <?php
+        <?php
     }
     ?>
 </section>

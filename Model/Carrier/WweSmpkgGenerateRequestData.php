@@ -1,5 +1,6 @@
 <?php
 namespace Eniture\WweSmallPackageQuotes\Model\Carrier;
+
 /**
  * class that generated request data
  */
@@ -15,6 +16,10 @@ class WweSmpkgGenerateRequestData
      * @var string
      */
     private $serviceType;
+    /**
+     * @var type
+     */
+    private $objectManager;
 
 
     public function _init(
@@ -22,13 +27,15 @@ class WweSmpkgGenerateRequestData
         $registry,
         $moduleManager,
         $dataHelper,
-        $request
+        $request,
+        $objectManager
     ) {
         $this->registry        = $registry;
         $this->scopeConfig     = $scopeConfig;
         $this->moduleManager   = $moduleManager;
         $this->dataHelper      = $dataHelper;
         $this->request         = $request;
+        $this->objectManager        = $objectManager;
     }
 
     /**
@@ -42,7 +49,7 @@ class WweSmpkgGenerateRequestData
         $wweSmpkgArr = [
             'licenseKey'    => $this->getConfigData('licenseKey'),
             'serverName'    => $this->request->getServer('SERVER_NAME'),
-            'carrierMode'   => 'pro', // use test / pro
+            'carrierMode'   => 'pro',
             'quotestType'   => 'small',
             'version'       => '1.0.0',
             'api'           => $this->getApiInfoArr(),
@@ -61,13 +68,13 @@ class WweSmpkgGenerateRequestData
      */
     public function generateRequestArray($request, $wweSmpkgArr, $itemsArr, $cart)
     {
-        if(count($wweSmpkgArr['originAddress']) > 1){
-            foreach($wweSmpkgArr['originAddress'] as $wh){
+        if (count($wweSmpkgArr['originAddress']) > 1) {
+            foreach ($wweSmpkgArr['originAddress'] as $wh) {
                 $whIDs[] = $wh['locationId'];
             }
-            if(count(array_unique($whIDs)) > 1){
-                foreach($wweSmpkgArr['originAddress'] as $id => $wh){
-                    if(isset($wh['InstorPickupLocalDelivery'])){
+            if (count(array_unique($whIDs)) > 1) {
+                foreach ($wweSmpkgArr['originAddress'] as $id => $wh) {
+                    if (isset($wh['InstorPickupLocalDelivery'])) {
                         $wweSmpkgArr['originAddress'][$id]['InstorPickupLocalDelivery'] = [];
                     }
                 }
@@ -193,11 +200,11 @@ class WweSmpkgGenerateRequestData
         foreach ($carriersArr as $carrkey => $carrArr) {
             $notHaveEmptyOrigin = true;
             foreach ($carrArr['originAddress'] as $key => $value) {
-                if(empty($value['senderZip'])){
+                if (empty($value['senderZip'])) {
                     $notHaveEmptyOrigin = false;
                 }
             }
-            if($notHaveEmptyOrigin){
+            if ($notHaveEmptyOrigin) {
                 $newCarriersArr[$carrkey] = $carrArr;
             }
         }
@@ -218,18 +225,19 @@ class WweSmpkgGenerateRequestData
         }
 
         $apiArray = [
-            'speed_ship_username'               => $this->getConfigData('username'), //'directsolar', //
-            'speed_ship_password'               => $this->getConfigData('password'), //'Supplynoho12116',//
-            'authentication_key'                => $this->getConfigData('authenticationKey'), //'ED16B9D917E28E98',//
-            'world_wide_express_account_number' => $this->getConfigData('accountNumber'), //'x037f5'
+            'speed_ship_username'               => $this->getConfigData('username'),
+            'speed_ship_password'               => $this->getConfigData('password'),
+            'authentication_key'                => $this->getConfigData('authenticationKey'),
+            'world_wide_express_account_number' => $this->getConfigData('accountNumber'),
             'prefferedCurrency'                 => $this->registry->registry('baseCurrency'),
             'includeDeclaredValue'              => $this->registry->registry('en_insurance'),
             'residentials_delivery'             => $resDelevery,
-            'deliverOnSat'                      => 'Y', // Y / N
+            'deliverOnSat'                      => 'Y',
         ];
+
+        $apiArray = $this->addResiGroundAccountDetail($apiArray);
         
         return  $apiArray;
-       
     }
 
     /**
@@ -240,10 +248,10 @@ class WweSmpkgGenerateRequestData
     public function getConfigData($fieldId)
     {
         $secThreeIds = ['residentialDlvry', 'weightExeeds'];
-        if (in_array($fieldId, $secThreeIds)){
+        if (in_array($fieldId, $secThreeIds)) {
             $sectionId = 'WweSmQuoteSetting';
             $groupId = 'third';
-        }else{
+        } else {
             $sectionId = 'WweSmConnSetting';
             $groupId = 'first';
         }
@@ -270,5 +278,21 @@ class WweSmpkgGenerateRequestData
         
         return  $receiverDataArr;
     }
-}
 
+    /**
+     * @return array
+     */
+    public function addResiGroundAccountDetail($apiArray)
+    {
+        if ($this->moduleManager->isEnabled('Eniture_WweSpqSecondAccount')) {
+
+            $secondAccHelper = $this->objectManager->get("\Eniture\WweSpqSecondAccount\Helper\Data");
+            $secondAccountReqArr = $secondAccHelper->getSecondAccountReqArr();
+            if (!empty($secondAccountReqArr)) {
+                $apiArray['residentialAccountDetail'] = $secondAccountReqArr;
+            }
+        }
+
+        return $apiArray ;
+    }
+}
