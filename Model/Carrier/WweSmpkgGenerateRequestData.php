@@ -51,7 +51,7 @@ class WweSmpkgGenerateRequestData
             'serverName'    => $this->request->getServer('SERVER_NAME'),
             'carrierMode'   => 'pro',
             'quotestType'   => 'small',
-            'version'       => '1.0.0',
+            'version'       => '2.0.7',
             'api'           => $this->getApiInfoArr(),
             'getDistance'   => $getDistance,
         ];
@@ -90,7 +90,7 @@ class WweSmpkgGenerateRequestData
         }
 
         $requestArr = [
-            'apiVersion'                    => '2.0',
+            'apiVersion'                    => '3.0',
             'platform'                      => 'magento2',
             'binPackagingMultiCarrier'      => $this->binPackSuspend(),
             'autoResidentials'              => $this->autoResidentialDelivery(),

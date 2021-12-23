@@ -83,4 +83,6 @@
      * @param {object} data
      * @returns {void}
      */
-    function wweSmPlanRefreshResponse(data){}
+    function wweSmPlanRefreshResponse(data){
+        document.location.reload(true);
+    }

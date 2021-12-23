@@ -111,6 +111,7 @@ class WweSmpkgShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier i
 
     public function collectRates(RateRequest $request)
     {
+
         if (!$this->scopeConfig->getValue(
             'carriers/ENWweSmpkg/active',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
@@ -120,9 +121,11 @@ class WweSmpkgShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier i
         }
 
         if (empty($request->getDestPostcode()) || empty($request->getDestCountryId()) ||
-            empty($request->getDestCity()) || empty($request->getDestRegionId())) {
+            empty($request->getDestCity()) || empty($request->getDestRegionId()) ||
+            (is_string($request->getDestCountryId()) && strtolower($request->getDestCountryId()) != 'us')) {
             return false;
         }
+
         // set shipment origin globally for instore pickup and local delivery
         if ($this->registry->registry('baseCurrency') === null) {
             $this->registry->register('baseCurrency', $this->dataHelper->getBaseCurrencyCode());
