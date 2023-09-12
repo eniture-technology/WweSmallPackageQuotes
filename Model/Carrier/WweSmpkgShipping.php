@@ -122,7 +122,7 @@ class WweSmpkgShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier i
 
         if (empty($request->getDestPostcode()) || empty($request->getDestCountryId()) ||
             empty($request->getDestCity()) || empty($request->getDestRegionId()) ||
-            (is_string($request->getDestCountryId()) && strtolower($request->getDestCountryId()) != 'us')) {
+            (empty($request->getDestCountryId()))) {
             return false;
         }
 

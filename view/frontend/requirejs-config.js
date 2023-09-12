@@ -8,7 +8,8 @@
 var config = {
     map: {
         '*': {
-            estimateRate : 'Eniture_WweSmallPackageQuotes/js/estimaterate',
+            /*estimateRate : 'Eniture_WweSmallPackageQuotes/js/estimaterate',*/
+            'Magento_Checkout/js/model/cart/totals-processor/default': 'Eniture_WweSmallPackageQuotes/js/model/cart/totals-processor/default'
         }
     }
 };

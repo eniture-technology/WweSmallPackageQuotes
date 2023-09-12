@@ -38,11 +38,18 @@ class TestConnection extends Action
             'platform'                          => 'magento2',
             'speed_freight_username'            => $credentials['username'] ?? '',
             'speed_freight_password'            => $credentials['password'] ?? '',
-            'authentication_key'                => $credentials['authenticationKey'] ?? '',
-            'world_wide_express_account_number' => $credentials['accountNumber'] ?? '',
             'plugin_licence_key'                => $credentials['pluginLicenceKey'] ?? '',
             'plugin_domain_name'                => $this->getStoreUrl(),
         ];
+
+        if(isset($credentials['apiEndpoint']) && $credentials['apiEndpoint'] == 'new'){
+            $postData['ApiVersion'] = '2.0';
+            $postData['clientId'] = $credentials['clientId'] ?? '';
+            $postData['clientSecret'] = $credentials['clientSecret'] ?? '';
+        }else{
+            $postData['authentication_key'] = $credentials['authenticationKey'] ?? '';
+            $postData['world_wide_express_account_number'] = $credentials['accountNumber'] ?? '';
+        }
 
         $response = $this->dataHelper->wweSmSendCurlRequest(WweSmConstants::TEST_CONN_URL, $postData);
 
@@ -63,7 +70,13 @@ class TestConnection extends Action
         $successMsg = 'The test resulted in a successful connection.';
         $erMsg = 'The credentials entered did not result in a successful test. Confirm your credentials and try again.';
 
-        if (isset($response->error) && $response->error == 1) {
+        if(isset($response->severity)){
+            if($response->severity == 'SUCCESS'){
+                $return['Success'] =  $successMsg;
+            }else{
+                $return['Error'] =  $response->Message ?? $erMsg;
+            }
+        }elseif (isset($response->error) && $response->error == 1) {
             $return['Error'] =  $erMsg;
         } elseif (isset($response->error) && $response->error == 0) {
             $return['Error'] =  $response->error_desc;

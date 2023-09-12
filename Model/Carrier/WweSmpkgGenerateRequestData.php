@@ -51,7 +51,7 @@ class WweSmpkgGenerateRequestData
             'serverName'    => $this->request->getServer('SERVER_NAME'),
             'carrierMode'   => 'pro',
             'quotestType'   => 'small',
-            'version'       => '2.0.7',
+            'version'       => '3.0.0',
             'api'           => $this->getApiInfoArr(),
             'getDistance'   => $getDistance,
         ];
@@ -225,18 +225,27 @@ class WweSmpkgGenerateRequestData
         }
 
         $apiArray = [
-            'speed_ship_username'               => $this->getConfigData('username'),
-            'speed_ship_password'               => $this->getConfigData('password'),
-            'authentication_key'                => $this->getConfigData('authenticationKey'),
-            'world_wide_express_account_number' => $this->getConfigData('accountNumber'),
             'prefferedCurrency'                 => $this->registry->registry('baseCurrency'),
             'includeDeclaredValue'              => $this->registry->registry('en_insurance'),
             'residentials_delivery'             => $resDelevery,
             'deliverOnSat'                      => 'Y',
         ];
 
+        if($this->getConfigData('apiEndpoint') == 'new'){
+            $apiArray['ApiVersion'] = '2.0';
+            $apiArray['clientId'] = $this->getConfigData('clientId');
+            $apiArray['clientSecret'] = $this->getConfigData('clientSecret');
+            $apiArray['speed_ship_username'] = $this->getConfigData('usernameNewAPI');
+            $apiArray['speed_ship_password'] = $this->getConfigData('passwordNewAPI');
+        }else{
+            $apiArray['speed_ship_username'] = $this->getConfigData('username');
+            $apiArray['speed_ship_password'] = $this->getConfigData('password');
+            $apiArray['authentication_key'] = $this->getConfigData('authenticationKey');
+            $apiArray['world_wide_express_account_number'] = $this->getConfigData('accountNumber');
+        }
+
         $apiArray = $this->addResiGroundAccountDetail($apiArray);
-        
+
         return  $apiArray;
     }
 

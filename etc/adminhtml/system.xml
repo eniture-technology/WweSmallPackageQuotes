@@ -30,21 +30,66 @@
             <resource>Eniture_WweSmallPackageQuotes::config</resource>
             <group id="first" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Connection Settings</label>
+                <field id="apiEndpoint" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Which API will you connect to?</label>
+                    <validate>required-entry</validate>
+                    <source_model>Eniture\WweSmallPackageQuotes\Model\Source\ApiEndpoint</source_model>
+                </field>
+                <!-- New API -->
+                <field id="clientId" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Client ID</label>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="apiEndpoint">new</field>
+                    </depends>
+                </field>
+                <field id="clientSecret" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Client Secret</label>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="apiEndpoint">new</field>
+                    </depends>
+                </field>
+                <field id="usernameNewAPI" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Username</label>
+                    <depends>
+                        <field id="apiEndpoint">new</field>
+                    </depends>
+                </field>
+                <field id="passwordNewAPI" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Password</label>
+                    <depends>
+                        <field id="apiEndpoint">new</field>
+                    </depends>
+                </field>
+                <!-- Legacy API -->
                 <field id="accountNumber" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Account Number</label>
                     <validate>required-entry</validate>
+                    <depends>
+                        <field id="apiEndpoint">legacy</field>
+                    </depends>
                 </field>
                 <field id="username" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Username</label>
                     <validate>required-entry</validate>
+                    <depends>
+                        <field id="apiEndpoint">legacy</field>
+                    </depends>
                 </field>
                 <field id="password" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Password</label>
                     <validate>required-entry</validate>
+                    <depends>
+                        <field id="apiEndpoint">legacy</field>
+                    </depends>
                 </field>
                 <field id="authenticationKey" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Authentication Key</label>
                     <validate>required-entry</validate>
+                    <depends>
+                        <field id="apiEndpoint">legacy</field>
+                    </depends>
                 </field>
                 <field id="licenseKey" translate="label" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Plugin License Key</label>
@@ -79,48 +124,54 @@
                 <label>Quote Settings</label>
                 <field id="serviceOptions" translate="label" type="multiselect" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Quote Service Options</label>
+                    <can_be_empty>1</can_be_empty>
                     <source_model>Eniture\WweSmallPackageQuotes\Model\Source\ServiceOptions</source_model>
                 </field>
-                <field id="transitDaysNumber" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="serviceOptionsInternational" translate="label" type="multiselect" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>International Services</label>
+                    <can_be_empty>1</can_be_empty>
+                    <source_model>Eniture\WweSmallPackageQuotes\Model\Source\InternationalServiceOptions</source_model>
+                </field>
+                <field id="transitDaysNumber" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enter the number of transit days to restrict ground service to. Leave blank to disable this feature.</label>
                     <validate>validate-number validate-length maximum-length-2 validate-not-negative-number validate-wwesm-integer</validate>
                 </field>
-                <field id="transitDaysRestrictionBy" translate="label" type="radios" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="transitDaysRestrictionBy" translate="label" type="radios" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Restrict By</label>
                     <source_model>Eniture\WweSmallPackageQuotes\Model\Source\TransitDaysRestrictionBy</source_model>
                 </field>
-                <field id="residentialDlvry" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="residentialDlvry" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Always Quote Residential Delivery</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment><![CDATA[Residential Delivery.]]></comment>
                 </field>
-                <field id="residentialAddressDetect" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="residentialAddressDetect" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Auto detect residential addresses</label>
                     <frontend_model>Eniture\WweSmallPackageQuotes\Block\System\Config\ResidentialAddressDetection</frontend_model>
                 </field>
-                <field id="boxSizesQuoteStng" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="boxSizesQuoteStng" translate="label" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Use My Standard Box Sizes</label>
                     <frontend_model>Eniture\WweSmallPackageQuotes\Block\System\Config\BoxSizes</frontend_model>
                 </field>
-                <field id="onlyGndService" translate="label" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="onlyGndService" translate="label" type="select" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Only quote ground service for hazardous materials shipments</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="gndHzrdousFee" translate="label" type="text" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="gndHzrdousFee" translate="label" type="text" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Ground Hazardous Material Fee</label>
                     <validate>validate-number validate-length maximum-length-7 validate-wwesm-decimal-limit-2</validate>
                     <comment><![CDATA[Enter an amount, e.g 20. or Leave blank to disable.]]></comment>
                 </field>
-                <field id="airHzrdousFee" translate="label" type="text" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="airHzrdousFee" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Air Hazardous Material Fee</label>
                     <validate>validate-number validate-length maximum-length-7 validate-wwesm-decimal-limit-2</validate>
                     <comment><![CDATA[Enter an amount, e.g 20. or Leave blank to disable.]]></comment>
                 </field>
-                <field id="hndlngFee" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="hndlngFee" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Handling Fee / Markup</label>
                     <validate>validate-number validate-length maximum-length-7 validate-wwesm-decimal-limit-2</validate>
                 </field>
-                <field id="symbolicHndlngFee" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="symbolicHndlngFee" translate="label" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Fee Type</label>
                     <source_model>Eniture\WweSmallPackageQuotes\Model\Source\HandlingFee</source_model>
                     <comment><![CDATA[Amount excluding tax. Enter an amount, e.g 3.75, or a percentage, e.g, 5%. Leave blank to disable.]]></comment>

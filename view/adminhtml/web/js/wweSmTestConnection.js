@@ -20,6 +20,10 @@
                     'username' : 'Username',
                     'password' : 'Password',
                     'authenticationKey' : 'Authentication Key',
+                    'clientId' : 'Client ID',
+                    'clientSecret' : 'Client Secret',
+                    'usernameNewAPI' : 'Username',
+                    'passwordNewAPI' : 'Password',
                     'licenseKey' : 'Plugin License Key'
                     };
 
@@ -37,13 +41,24 @@
      */
     function wweSmTestConnAjaxCall($, ajaxURL){
         let sectionId = '#WweSmConnSetting_first_';
+        let apiEndpoint = $(sectionId+'apiEndpoint').val();
         let credentials = {
-            accountNumber       : $(sectionId+'accountNumber').val(),
-            username            : $(sectionId+'username').val(),
-            password            : $(sectionId+'password').val(),
-            authenticationKey   : $(sectionId+'authenticationKey').val(),
-            pluginLicenceKey    : $(sectionId+'licenseKey').val()
+            'pluginLicenceKey'    : $(sectionId+'licenseKey').val(),
+            'apiEndpoint'         : apiEndpoint
         };
+
+        if(apiEndpoint == 'new'){
+            credentials.clientId            = $(sectionId+'clientId').val();
+            credentials.clientSecret        = $(sectionId+'clientSecret').val();
+            credentials.username            = $(sectionId+'usernameNewAPI').val();
+            credentials.password            = $(sectionId+'passwordNewAPI').val();
+            
+        }else{
+            credentials.accountNumber       = $(sectionId+'accountNumber').val();
+            credentials.username            = $(sectionId+'username').val();
+            credentials.password            = $(sectionId+'password').val();
+            credentials.authenticationKey   = $(sectionId+'authenticationKey').val();
+        }
 
         wweSmAjaxRequest(credentials, ajaxURL, wweSmTestConnResponse);
         

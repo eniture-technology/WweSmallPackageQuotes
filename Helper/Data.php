@@ -26,6 +26,7 @@ class Data extends AbstractHelper
     public $canAddWh = 1;
     public $cacheManager;
     public $objectManager;
+    public $configWriter;
     /**
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Framework\App\ResourceConnection $resource
@@ -55,7 +56,8 @@ class Data extends AbstractHelper
         \Eniture\WweSmallPackageQuotes\Model\EnituremodulesFactory $enituremodulesFactory,
         \Magento\Framework\HTTP\Client\Curl $curl,
         \Magento\Framework\App\Cache\Manager $cacheManager,
-        \Magento\Framework\ObjectManagerInterface $objectmanager
+        \Magento\Framework\ObjectManagerInterface $objectmanager,
+        \Magento\Framework\App\Config\Storage\WriterInterface $configWriter
     ) {
         $this->resource            = $resource;
         $this->shippingConfig      = $shippingConfig;
@@ -72,6 +74,7 @@ class Data extends AbstractHelper
         $this->curl = $curl;
         $this->cacheManager = $cacheManager;
         $this->objectManager = $objectmanager;
+        $this->configWriter = $configWriter;
         parent::__construct($context);
     }
 
@@ -674,9 +677,12 @@ class Data extends AbstractHelper
     public function getAllConfigServicesArray($scopeConfig)
     {
         $servicesOptions   = $scopeConfig->getValue('WweSmQuoteSetting/third/serviceOptions', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        $quoteServices     = explode(',', $servicesOptions);
+        $quoteServices     = (empty($servicesOptions)) ? [] : explode(',', $servicesOptions);
 
-        return $quoteServices;
+        $IntServicesOptions   = $scopeConfig->getValue('WweSmQuoteSetting/third/serviceOptionsInternational', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $IntQuoteServices     = (empty($IntServicesOptions)) ? [] : explode(',', $IntServicesOptions);
+
+        return array_merge($quoteServices, $IntQuoteServices);
     }
     
     /**
@@ -1070,6 +1076,27 @@ class Data extends AbstractHelper
         if ($moduleManager->isEnabled('Eniture_WweSpqSecondAccount')) {
             $helperObj = $this->objectManager->get("Eniture\WweSpqSecondAccount\Helper\Data");
             $quotes = $helperObj->addResiGroundRatesIntoNormalRatesArr($quotes);
+        }
+
+        // Code related to OLD to NEW API migration
+        foreach ($quotes as $key => $quote) {
+            if(isset($quote->newAPICredentials) && !empty($quote->newAPICredentials->client_id) && !empty($quote->newAPICredentials->client_secret)){
+                $this->configWriter->save('WweSmConnSetting/first/clientId', $quote->newAPICredentials->client_id);
+                $this->configWriter->save('WweSmConnSetting/first/clientSecret', $quote->newAPICredentials->client_secret);
+                $this->configWriter->save('WweSmConnSetting/first/apiEndpoint', 'new');
+                $username = $this->getConfigData('WweSmConnSetting/first/username');
+                $password = $this->getConfigData('WweSmConnSetting/first/password');
+                $this->configWriter->save('WweSmConnSetting/first/usernameNewAPI', $username);
+                $this->configWriter->save('WweSmConnSetting/first/passwordNewAPI', $password);
+                unset($quotes[$key]->newAPICredentials);
+                $this->clearCache();
+            }
+
+            if(isset($quote->oldAPICredentials)){
+                $this->configWriter->save('WweSmConnSetting/first/apiEndpoint', 'legacy');
+                unset($quotes[$key]->oldAPICredentials);
+                $this->clearCache();
+            }
         }
 
         return $quotes;

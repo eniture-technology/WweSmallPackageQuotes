@@ -1,9 +1,15 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
+        <WweSmConnSetting>
+            <first>
+                <apiEndpoint>legacy</apiEndpoint>
+            </first>
+        </WweSmConnSetting>
         <WweSmQuoteSetting>
             <third>
                 <serviceOptions>GND,3DS,2DA,2DM,1DP,1DA,1DM</serviceOptions>
+                <serviceOptions>01,28,21,05,03</serviceOptions>
             </third>
         </WweSmQuoteSetting>
         <carriers>
@@ -12,7 +18,7 @@
                 <sallowspecific>0</sallowspecific>
                 <price>0</price>
                 <model>Eniture\WweSmallPackageQuotes\Model\Carrier\WweSmpkgShipping</model>
-                <allowed_methods>GND,3DS,2DA,2DM,1DP,1DA,1DM</allowed_methods>
+                <allowed_methods>GND,3DS,2DA,2DM,1DP,1DA,1DM,01,28,21,05,03</allowed_methods>
                 <name>Fixed</name>
                 <title>Worldwide Small Package Quotes</title>
                 <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>

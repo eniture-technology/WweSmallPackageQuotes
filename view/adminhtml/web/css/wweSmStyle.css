@@ -163,11 +163,13 @@ button.en-btn:focus{
 /*    color: red;*/
 /*}*/
 
-label[for="WweSmConnSetting_first_accountNumber"]:after,
-label[for="WweSmConnSetting_first_username"]:after,
-label[for="WweSmConnSetting_first_password"]:after,
-label[for="WweSmConnSetting_first_authenticationKey"]:after,
-label[for="WweSmConnSetting_first_licenseKey"]:after{
+label[for="WweSmConnSetting_first_accountNumber"]:not(.mage-error):after,
+label[for="WweSmConnSetting_first_username"]:not(.mage-error):after,
+label[for="WweSmConnSetting_first_password"]:not(.mage-error):after,
+label[for="WweSmConnSetting_first_authenticationKey"]:not(.mage-error):after,
+label[for="WweSmConnSetting_first_clientId"]:not(.mage-error):after,
+label[for="WweSmConnSetting_first_clientSecret"]:not(.mage-error):after,
+label[for="WweSmConnSetting_first_licenseKey"]:not(.mage-error):after{
     content: '*';
     color: red;
     padding: 5px;
