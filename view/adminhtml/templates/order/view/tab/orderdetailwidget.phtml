@@ -3,15 +3,16 @@
     <?php
     $order = $block->getOrder();
     $orderDetailData = $order->getData('order_detail_data');
-    $orderDetailData = isset($orderDetailData)?json_decode($orderDetailData, true):null;
+    $orderDetailData = isset($orderDetailData) ? json_decode($orderDetailData, true) : null;
     if (!is_null($orderDetailData)) {
         $shimentNumber = 1;
         foreach ($orderDetailData['shipmentData'] as $key => $order) {
             $residential = $orderDetailData['residentialDelivery'];
 
             if (isset($order) && !empty($order)) {
+                $code = (isset($order['quotes']['code'])) ? $order['quotes']['code'] : '';
                 $title = (isset($order['quotes']['title']))?$order['quotes']['title'].' :':'';
-                $rate = (isset($order['quotes']['rate']))?number_format($order['quotes']['rate'], 2, '.', ''):'0.00';
+                $rate = (isset($order['quotes']['rate'])) ? number_format((float)$order['quotes']['rate'], 2, '.', '') : '0.00';
 
                 if ($shimentNumber > 1) {
                     ?>
@@ -48,7 +49,7 @@
                     }
                 }
 
-                if ($residential || $hazordusFee) {
+                if (($code !== 'INSP' && $code !== 'LOCDEL') && ($residential || $hazordusFee)) {
                     ?>
                             <h4 class='order-detail-hdng'>Additional Information</h4>
                             <div class="order-additionalInfo-block">

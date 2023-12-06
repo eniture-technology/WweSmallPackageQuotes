@@ -12,6 +12,8 @@ class Edit extends \Magento\Catalog\Controller\Adminhtml\Product\Edit
     private $attributeFactory;
     private $dsSourceModel = null;
     private $enDsSource;
+    public $resultPageFactory;
+    public $enModuleFactoryCreate;
     /**
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Catalog\Controller\Adminhtml\Product\Builder $productBuilder

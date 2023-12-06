@@ -173,7 +173,6 @@ class InstallData implements InstallDataInterface
      */
     private function addOrderDetailColumn()
     {
-
         $tableName = $this->setup->getTable('sales_order');
         if ($this->connection->isTableExists($tableName) == true) {
             if ($this->connection->tableColumnExists($tableName, 'order_detail_data') === false) {

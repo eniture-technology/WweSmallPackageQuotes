@@ -13,13 +13,19 @@ use \Magento\Framework\App\Helper\AbstractHelper;
 class Data extends AbstractHelper
 {
     public $connection;
+    public $resource;
+    public $currenciesModel;
     public $WHtableName;
     public $shippingConfig;
     public $storeManager;
     public $currencyFactory;
     public $priceCurrency;
+    public $directoryHelper;
     public $registry;
     public $coreSession;
+    public $warehouseFactory;
+    public $enituremodulesFactory;
+    public $context;
     public $originZip;
     public $residentialDelivery;
     public $curl;
@@ -27,6 +33,12 @@ class Data extends AbstractHelper
     public $cacheManager;
     public $objectManager;
     public $configWriter;
+    public $residentialDlvry;
+    public $fedexRates;
+    public $onlyGndService;
+    public $gndHzrdousFee;
+    public $airHzrdousFee;
+
     /**
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Framework\App\ResourceConnection $resource
@@ -217,17 +229,12 @@ class Data extends AbstractHelper
      */
     function quoteSettingsData($scopeConfig)
     {
-        $fields = [
-            'residentialDlvry'  => 'residentialDlvry',
-            'fedexRates'        => 'fedexRates',
-            'onlyGndService'    => 'onlyGndService',
-            'gndHzrdousFee'     => 'gndHzrdousFee',
-            'airHzrdousFee'     => 'airHzrdousFee',
-        ];
-        foreach ($fields as $key => $field) {
-            $this->$key = $this->adminConfigData($field, $scopeConfig);
-        }
-
+        $this->residentialDlvry = $this->adminConfigData('residentialDlvry', $scopeConfig);
+        $this->fedexRates = $this->adminConfigData('fedexRates', $scopeConfig);
+        $this->onlyGndService = $this->adminConfigData('onlyGndService', $scopeConfig);
+        $this->gndHzrdousFee = $this->adminConfigData('gndHzrdousFee', $scopeConfig);
+        $this->airHzrdousFee = $this->adminConfigData('airHzrdousFee', $scopeConfig);
+        
         // Get origin zipcode array for onerate settings
         $this->getOriginZipCodeArr();
     }
@@ -324,7 +331,12 @@ class Data extends AbstractHelper
         try {
             $this->curl->post($url, $fieldString);
             $output = $this->curl->getBody();
-            $result = json_decode($output, $isAssocArray);
+            if(!empty($output) && is_string($output)){
+                $result = json_decode($output, $isAssocArray);
+            }else{
+                $result = ($isAssocArray) ? [] : '';
+            }
+            
         } catch (\Throwable $e) {
             $result = [];
         }
@@ -337,13 +349,13 @@ class Data extends AbstractHelper
      */
     public function getZipcode($key)
     {
-        $key = explode("_", $key);
+        $key = empty($key) ? [] : explode("_", $key);
         return (isset($key[0])) ? $key[0] : "";
     }
     
     /**
      * Method Quotes
-     * @param $quotes
+     * @param type array $quotes
      * @param $getMinimum
      * @return array
      */
@@ -362,6 +374,7 @@ class Data extends AbstractHelper
         $multiShipment = (count($quotes)>1 ? true : false);
 
         foreach ($quotes as $key => $quote) {
+
             $instPkpLclDlvry = isset($quote->InstorPickupLocalDelivery) ? $quote->InstorPickupLocalDelivery : "";
             if (!isset($quote->q)) {
                 if (!empty($instPkpLclDlvry) && !$multiShipment) {
@@ -549,7 +562,7 @@ class Data extends AbstractHelper
         $daysToRestrict = $this->getConfigData('WweSmQuoteSetting/third/transitDaysNumber');
         $transitDayType = $this->getConfigData('WweSmQuoteSetting/third/transitDaysRestrictionBy');
         $plan = $this->wweSmallPlanInfo('ENWweSmpkg');
-        if ($plan['planNumber'] == 3 && strlen($daysToRestrict) > 0 && strlen($transitDayType) > 0) {
+        if ($plan['planNumber'] == 3 && !empty($daysToRestrict) > 0 && !empty($transitDayType) > 0) {
             if (isset($service->$transitDayType) &&
                 ($service->$transitDayType >= $daysToRestrict)) {
                 return true;
@@ -595,7 +608,7 @@ class Data extends AbstractHelper
      */
     public function findArrayMininum($servicesArr)
     {
-        $counter = 1;
+        $counter = $minimum = 1;
         $minIndex = [];
         foreach ($servicesArr as $key => $value) {
             if ($counter == 1) {
@@ -796,6 +809,7 @@ class Data extends AbstractHelper
      */
     public function setOrderDetailWidgetData(array $servicesArr, $scopeConfig)
     {
+        $orderDetail = [];
         $orderDetail['residentialDelivery'] = ($this->residentialDelivery != '' || $this->residentialDlvry == '1' || $this->residentialDlvry == 'yes') ?
             'Residential Delivery' : '';
 
@@ -1042,8 +1056,18 @@ class Data extends AbstractHelper
             ->addFilter('warehouse_id', ['eq' => $data['locationId']]);
 
         $whCollection = $this->purifyCollectionData($whCollection);
-        $instore = json_decode($whCollection[0]['in_store'], true);
-        $locDel  = json_decode($whCollection[0]['local_delivery'], true);
+        
+        if(!empty($whCollection[0]['in_store']) && is_string($whCollection[0]['in_store'])){
+            $instore = json_decode($whCollection[0]['in_store'], true);
+        }else{
+            $instore = [];
+        }
+
+        if(!empty($whCollection[0]['local_delivery']) && is_string($whCollection[0]['local_delivery'])){
+            $locDel  = json_decode($whCollection[0]['local_delivery'], true);
+        }else{
+            $locDel = [];
+        }
 
         if ($instore) {
             $inStoreTitle = $instore['checkout_desc_store_pickup'];

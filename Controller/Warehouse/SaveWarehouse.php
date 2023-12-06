@@ -43,7 +43,7 @@ class SaveWarehouse extends Action
         $updateInspld = false;
 
         foreach ($this->getRequest()->getPostValue() as $key => $post) {
-            $saveWhData[$key] = filter_var($post, FILTER_SANITIZE_STRING);
+            $saveWhData[$key] = htmlspecialchars($post, ENT_QUOTES);
         }
 
         $inputDataArr = $this->dataHelper->wweSmOriginArray($saveWhData);

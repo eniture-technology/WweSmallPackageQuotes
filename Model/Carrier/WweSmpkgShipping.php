@@ -40,6 +40,14 @@ class WweSmpkgShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier i
     public $mageVersion;
 
     public $objectManager;
+    public $cart;
+    public $urlInterface;
+    public $wweAdminConfig;
+    public $wweShipPkg;
+    public $wweReqData;
+    public $wweSetGlobalCarrier;
+    public $wweMangQuotes;
+    public $httpRequest;
 
     /**
      * WweSmpkgShipping constructor.
@@ -319,10 +327,10 @@ class WweSmpkgShipping extends \Magento\Shipping\Model\Carrier\AbstractCarrier i
                     'lineItemName'              => $_product->getName(),
                     'piecesOfLineItem'          => $productQty,
                     'lineItemPrice'             => $_product->getPrice(),
-                    'lineItemWeight'            => number_format($_product->getWeight(), 2, '.', ''),
-                    'lineItemLength'            => number_format($length, 2, '.', ''),
-                    'lineItemWidth'             => number_format($width, 2, '.', ''),
-                    'lineItemHeight'            => number_format($height, 2, '.', ''),
+                    'lineItemWeight'            => number_format((float)$_product->getWeight(), 2, '.', ''),
+                    'lineItemLength'            => number_format((float)$length, 2, '.', ''),
+                    'lineItemWidth'             => number_format((float)$width, 2, '.', ''),
+                    'lineItemHeight'            => number_format((float)$height, 2, '.', ''),
                     'isHazmatLineItem'          => $hazmat,
                     'product_insurance_active'  => $insurance,
                     'shipBinAlone'              => $_product->getData('en_own_package'),

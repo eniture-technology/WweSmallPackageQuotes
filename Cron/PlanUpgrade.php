@@ -74,8 +74,12 @@ class PlanUpgrade
 
         $this->curl->post(WweSmConstants::PLAN_URL, $postData);
         $output = $this->curl->getBody();
-        $result = json_decode($output, true);
-
+        if(!empty($output) && is_string($output)){
+            $result = json_decode($output, true);
+        }else{
+            $result = [];
+        }
+        
         $plan       = !empty($result['pakg_group']) ? $result['pakg_group'] : 0;
         $expireDay  = $result['pakg_duration'] ?? '';
         $expiryDate = $result['expiry_date'] ?? '';

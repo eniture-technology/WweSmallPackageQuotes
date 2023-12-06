@@ -31,7 +31,7 @@ class TestConnection extends Action
     {
         $credentials = [];
         foreach ($this->getRequest()->getPostValue() as $key => $data) {
-            $credentials[$key] = filter_var($data, FILTER_SANITIZE_STRING);
+            $credentials[$key] = $data;
         }
 
         $postData = [
@@ -68,21 +68,24 @@ class TestConnection extends Action
 
         $return = [];
         $successMsg = 'The test resulted in a successful connection.';
-        $erMsg = 'The credentials entered did not result in a successful test. Confirm your credentials and try again.';
+        $erMsg = 'Empty response from API';
 
-        if(isset($response->severity)){
+        if(empty($response)){
+            $return['Error'] =  $erMsg;
+        } elseif(isset($response->severity)){
             if($response->severity == 'SUCCESS'){
                 $return['Success'] =  $successMsg;
             }else{
                 $return['Error'] =  $response->Message ?? $erMsg;
             }
-        }elseif (isset($response->error) && $response->error == 1) {
-            $return['Error'] =  $erMsg;
-        } elseif (isset($response->error) && $response->error == 0) {
-            $return['Error'] =  $response->error_desc;
-        } else {
+        }elseif (isset($response->error) && ($response->error == 1 || $response->error == 0)) {
+            $return['Error'] =  $response->error_desc ?? $erMsg;
+        }elseif (isset($response->success) && $response->success == 1) {
             $return['Success'] =  $successMsg;
+        } else {
+            $return['Error'] =  'An empty or unknown response format, therefore we are unable to determine whether it was successful or an error';
         }
+
         return json_encode($return);
     }
 

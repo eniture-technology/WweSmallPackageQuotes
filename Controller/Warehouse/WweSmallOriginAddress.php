@@ -42,7 +42,7 @@ class WweSmallOriginAddress extends Action
     public function execute()
     {
         foreach ($this->getRequest()->getPostValue() as $key => $post) {
-            $data[$key] = filter_var($post, FILTER_SANITIZE_STRING);
+            $data[$key] = htmlspecialchars($post, ENT_QUOTES);
         }
 
         $originZip = $data['origin_zip'] ?? '';

@@ -12,6 +12,7 @@ namespace Eniture\WweSmallPackageQuotes\Model\Carrier;
 class WweSmallSetCarriersGlobaly
 {
     public $dataHelper;
+    public $_registry;
     /**
      * constructor of class
      */
